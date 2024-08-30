@@ -1,0 +1,145 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Billing {% endblock title %}
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+            {% if not form.instance.pk %}
+                <h1>Add Billing</h1>
+            {% else %}
+                <h1>Edit Billing</h1>
+            {% endif %}
+            </div>
+            <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{% url 'admin:billing' %}">Billing</a></li>
+                {% if not form.instance.pk %}
+                <li class="breadcrumb-item active">Add Billing</li>
+                {% else %}
+                <li class="breadcrumb-item active">Edit Billing</li>
+                {% endif %}
+            </ol>
+            </div>
+        </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-6">
+          <!-- jquery validation -->
+          <div class="card card-primary">
+            <div class="card-header">
+                {% if not form.instance.pk %}
+                <h3 class="card-title">Add Billing</h3>
+                {% else %}
+                <h3 class="card-title">Edit Billing</h3>
+                {% endif %}
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="quickForm" method="POST" enctype="multipart/form-data">
+              <div class="card-body">
+                {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{field}}
+                        </div>
+                        <small class="text-danger">{{ field.errors }}</small>
+                    {% endfor %}
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                {% if not form.instance.pk %}
+                <button type="submit" class="btn btn-primary">Create Billing</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">Update Billing</button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+          <!-- /.card -->
+          </div>
+        <!--/.col (left) -->
+        <!-- right column -->
+        <div class="col-md-6">
+
+        </div>
+        <!--/.col (right) -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+<!-- jquery-validation -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script>
+    $(function () {
+        $('#quickForm').validate({
+            rules: {
+                work_order_invoice_id: {
+                    required: true
+                },
+                material_invoice_id: {
+                    required: true
+                },
+                work_order_amount: {
+                    required: true
+                },
+                material_invoice_amount: {
+                    required: true
+                },
+                total_amount: {
+                    required: true
+                }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+    });
+    $(document).ready(function() {
+        function updateAmounts() {
+            var workOrderInvoiceId = $('#id_work_order_invoice_id').val();
+            var materialInvoiceId = $('#id_material_invoice_id').val();
+
+            $.ajax({
+                url: "{% url 'admin:get_invoice_amounts' %}",
+                data: {
+                    'work_order_invoice_id': workOrderInvoiceId,
+                    'material_invoice_id': materialInvoiceId
+                },
+                success: function(data) {
+                    $('#id_work_order_amount').val(data.work_order_amount);
+                    $('#id_material_invoice_amount').val(data.material_invoice_amount);
+                    $('#id_total_amount').val(data.total_amount);
+                }
+            });
+        }
+
+        $('#id_work_order_invoice_id').change(updateAmounts);
+        $('#id_material_invoice_id').change(updateAmounts);
+    });
+</script>
+{% endblock extra_scripts %}

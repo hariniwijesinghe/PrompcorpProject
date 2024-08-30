@@ -1,0 +1,170 @@
+
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %} Timesheet {% endblock title %}
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        {% if messages.success %}
+            <div class="alert alert-success" role="alert">
+                {% for message in messages.success %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Timesheet</h1>
+            </div>
+            <div class="col-md-4">
+                <form  method="get" action="{% url 'admin:job_order_timesheet_list' %}">
+                    <div class="input-group">
+                        <input type="text" name="search_query" class="form-control form-control-lg" value="{{ search_form.cleaned_data.search_query }}" placeholder="Search Timesheet...">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-lg btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'admin:create_job_order_timesheet' %}" class="btn btn-block btn-primary"><i class="fas fa-plus"></i> Add Timesheet</a>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- Default box -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Timesheet</h3>
+
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped projects">
+              <thead>
+                    <tr>
+                        <th style="width: 5%">
+                            <a href="?sort_order={% if sort_order == 'job_id' %}-job_id{% else %}job_id{% endif %}">#</a>
+                        </th>
+                        <th style="width: 15%">
+                            <a href="?sort_order={% if sort_order == 'department_id' %}-department_id{% else %}department_id{% endif %}">Job</a>
+                        </th>
+                        <th style="width: 15%">
+                            <a href="?sort_order={% if sort_order == 'date' %}-date{% else %}date{% endif %}">Date</a>
+                        </th>
+                        <th style="width: 15%">
+                            <a href="?sort_order={% if sort_order == 'start_time' %}-start_time{% else %}start_time{% endif %}">Start Time</a>
+                        </th>
+                        <th style="width: 15%">
+                            <a href="?sort_order={% if sort_order == 'end_time' %}-end_time{% else %}end_time{% endif %}">End Time</a>
+                        </th>
+                        <th style="width: 15%">
+                            <a href="?sort_order={% if sort_order == 'approval_status' %}-approval_status{% else %}approval_status{% endif %}">Approval Status</a>
+                        </th>
+                        <th style="width: 10%">
+                            <a href="?sort_order={% if sort_order == 'added_by' %}-added_by{% else %}added_by{% endif %}">Added By</a>
+                        </th>
+                        <th style="width: 15%">
+                            <a href="?sort_order={% if sort_order == 'created_at' %}-created_at{% else %}created_at{% endif %}">Created Date</a>
+                        </th>
+                        <th style="width: 25%">Action</th>
+                    </tr>
+              </thead>
+              <tbody>
+                {% for data in dataset %}
+                    <tr>
+                        <td>#{{data.job_id}}</td>
+                        <td>#{{ data.job_order_id.job_order_id }} - {{ data.job_order_id.job_desc }}</td>
+                        <td>{{ data.date|date:"Y-m-d" }}</td>
+                        <td>{{ data.start_time|date:"H:i:s" }}</td>
+                        <td>{{ data.end_time|date:"H:i:s" }}</td>
+                        <td>
+                            {% if data.approval_status == 'APPROVED' %}
+                                <span class="badge badge-success">Approved</span>
+                            {% else %}
+                                <span class="badge badge-danger">Declined</span>
+                            {% endif%}
+                        </td>
+                        <td>{{ data.added_by.username }}</td>
+                        <td>
+                          {{ data.created_at|date:"Y-m-d H:i:s" }}
+                        </td>
+                        <td class="project-actions text-center">
+                            <a class="btn btn-info btn-sm" href="{% url 'admin:update_job_order_timesheet' data.job_id %}">
+                                <i class="fas fa-pencil-alt">
+                                </i>
+                            </a>
+                            <button class="btn btn-danger btn-sm delete_timesheet" data-toggle="modal" data-target="#deleteModal" data-timesheet-id="{{ data.job_id }}">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>Are you sure you want to delete this timesheet?</p>
+                  <form id="deleteForm" method="post" action="{% url 'admin:delete_job_order_timesheet' %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="id" id="id" value="">
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+              </div>
+          </div>
+      </div>
+  </div>
+  </div>
+{% endblock content %}
+{% block extra_scripts %}
+<script>
+  $(document).ready(function() {
+    // When the delete button is clicked
+    $('.delete_timesheet').on('click', function() {
+        var id = $(this).data('id');
+        $('[name="id"]').val(id);
+    });
+
+    // When the confirm delete button is clicked
+    $('#confirmDelete').on('click', function() {
+        $('#deleteForm').submit();
+    });
+});
+</script>
+{% endblock extra_scripts %}

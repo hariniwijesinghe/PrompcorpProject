@@ -1,0 +1,7 @@
+{% if messages.success %}
+    <div class="alert alert-success" role="alert">
+        {% for message in messages.success %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}

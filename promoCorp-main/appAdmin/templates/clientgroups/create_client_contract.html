@@ -1,0 +1,147 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Client Contract {% endblock title %}
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+            {% if not contract_id %}
+                <h1>Add Client Contract</h1>
+            {% else %}
+                <h1>Edit Client Contract</h1>
+            {% endif %}
+            </div>
+            <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Clients</li>
+                <li class="breadcrumb-item"><a href="{% url 'admin:client_contract_list' %}">Client Contracts</a></li>
+                {% if not contract_id %}
+                <li class="breadcrumb-item active">Add Client Contract</li>
+                {% else %}
+                <li class="breadcrumb-item active">Edit Client Contract</li>
+                {% endif %}
+            </ol>
+            </div>
+        </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-6">
+          <!-- jquery validation -->
+          <div class="card card-primary">
+            <div class="card-header">
+                {% if not contract_id %}
+                <h3 class="card-title">Add Client Contract</h3>
+                {% else %}
+                <h3 class="card-title">Edit Client Contract</h3>
+                {% endif %}
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="quickForm" method="POST">
+              <div class="card-body">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{field}}
+                    </div>
+                    <small class="text-danger">{{ field.errors }}</small>
+                {% endfor %}
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                {% if form.instance.pk %}
+                <button type="submit" class="btn btn-primary">Update Client Contract</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">Create Client Contract</button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+          <!-- /.card -->
+          </div>
+        <!--/.col (left) -->
+        <!-- right column -->
+        <div class="col-md-6">
+
+        </div>
+        <!--/.col (right) -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+<!-- jquery-validation -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script>
+    $(function() {
+        $("#id_phone_number").mask("0000 000 000");
+    });
+  $(function () {
+    $('#quickForm').validate({
+      rules: {
+        account_number: {
+            required: true
+        },
+        name: {
+            required: true
+        },
+        email: {
+            email:true,
+            required: true
+        },
+        role: {
+            required: true
+        },
+        phone_number: {
+            australianPhone: true,
+            required: true
+        },
+        address: {
+            required: true,
+            // validABN: true,
+        }
+      },
+      messages: {
+            email: {
+                required: "Email is required.",
+                email: "Please enter a valid email address."
+            },
+            phone_number:{
+                required: "Phone number is required.",
+                australianPhone: "Please enter a valid Australian phone number (e.g., 0412 345 678)."
+            }
+        },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      }
+    });
+    $.validator.addMethod("australianPhone", function(value, element) {
+        // Regular expression for Australian phone number format (e.g., 0412 345 678)
+        return this.optional(element) || /^\d{4} \d{3} \d{3}$/.test(value);
+    }, "Please enter a valid Australian phone number (e.g., 0412 345 678).")
+  });
+  </script>
+{% endblock extra_scripts %}

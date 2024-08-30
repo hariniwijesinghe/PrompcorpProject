@@ -1,0 +1,56 @@
+{% load i18n %}
+<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+    
+    {% if request.user.is_authenticated %}
+    {% for app in app_list %}
+    <li class="nav-item {% if app_label == app.label %} menu-open {% endif %}">
+      <a class="nav-link {% if app_label != app.label %} collapsed{% endif %}"
+        data-bs-toggle="collapse" data-bs-target="#submenu-{{ app.app_label }}" href="{{ app.url }}">
+        <i class="fa fa-{{ app.icon }} nav-icon"></i>
+        <p>
+          {{ app.label|slice:10 }}{% if app.label|length > 10 %}..{% endif %}
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+
+      {% if app.models %}
+      <ul class="nav nav-treeview">
+        {% for model in app.models %}
+        {% if model.url %}
+        <li class="nav-item">
+          <a class="nav-link {% if 'bootstrap-tables' in segment or model.url in request.path|urlencode %} active {% endif %}"
+            href="{{ model.url }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>{{ model.label }}</p>
+          </a>
+        </li>
+        {% else %}
+        <li class="nav-item">{{ model.label }}</li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </li>
+    {% endfor %}
+    <li class="nav-item">
+      <a href="{% url 'admin:logout' %}" class="nav-link">
+        <i class="fa fa-sign-out-alt nav-icon"></i>
+        <p>Logout</p>
+      </a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+      <a href="{% url 'admin:login' %}" class="nav-link">
+        <i class="fa fa-sign-in-alt nav-icon"></i>
+        <p>Login</p>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'admin:register' %}" class="nav-link">
+        <i class="fa fa-user-plus nav-icon"></i>
+        <p>Register</p>
+      </a>
+    </li>        
+    {% endif %}      
+    
+  </ul>

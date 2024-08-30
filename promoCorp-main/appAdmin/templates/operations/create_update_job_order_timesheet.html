@@ -1,0 +1,152 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Timesheet {% endblock title %}
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+            {% if not form.instance.pk %}
+                <h1>Add Timesheet</h1>
+            {% else %}
+                <h1>Edit Timesheet</h1>
+            {% endif %}
+            </div>
+            <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{% url 'admin:job_order_timesheet_list' %}">Timesheet</a></li>
+                {% if not form.instance.pk %}
+                <li class="breadcrumb-item active">Add Timesheet</li>
+                {% else %}
+                <li class="breadcrumb-item active">Edit Timesheet</li>
+                {% endif %}
+            </ol>
+            </div>
+        </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-6">
+          <!-- jquery validation -->
+          <div class="card card-primary">
+            <div class="card-header">
+                {% if not form.instance.pk %}
+                <h3 class="card-title">Add Timesheet</h3>
+                {% else %}
+                <h3 class="card-title">Edit Timesheet</h3>
+                {% endif %}
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="quickForm" method="POST" enctype="multipart/form-data">
+              <div class="card-body">
+                {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{field}}
+                        </div>
+                        <small class="text-danger">{{ field.errors }}</small>
+                    {% endfor %}
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                {% if not form.instance.pk %}
+                <button type="submit" class="btn btn-primary">Create Timesheet</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">Update Timesheet</button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+          <!-- /.card -->
+          </div>
+        <!--/.col (left) -->
+        <!-- right column -->
+        <div class="col-md-6">
+
+        </div>
+        <!--/.col (right) -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+<!-- jquery-validation -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script>
+    $(function () {
+        $('#quickForm').validate({
+            rules: {
+                job_order_id: {
+                    required: true
+                },
+                date: {
+                    required: true
+                },
+                start_time: {
+                    required: true
+                },
+                end_time: {
+                    required: true
+                }
+            },
+            messages: {
+                employee_email: {
+                    required: "Email is required.",
+                    email: "Please enter a valid email address."
+                },
+                employee_phone:{
+                    required: "Phone number is required.",
+                    australianPhone: "Please enter a valid Australian phone number (e.g., 0412 345 678)."
+                }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+        // Attach a change event listener to the department dropdown
+        $('#id_work_order_id').on('change', function() {
+            console.log($(this).val());
+            // Get the selected department ID
+            const work_order_id = $(this).val();
+            
+            // Make an AJAX GET request to fetch employees based on the selected department
+            $.ajax({
+                url: '{% url "admin:fetch_job_orders" %}',
+                data: { 'work_order_id': work_order_id },
+                dataType: 'json',
+                success: function(data) {
+                    // Clear the employee dropdown
+                    $('#id_job_order_id').empty();
+                    $('#id_job_order_id').append('<option value="">Select Job</option>');
+                    // Populate the employee dropdown with the received data
+                    $.each(data.joborders, function(index, joborder) {
+                        $('#id_job_order_id').append('<option value="' + joborder.id + '">#' + joborder.id + ' - ' + joborder.name + '</option>');
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock extra_scripts %}

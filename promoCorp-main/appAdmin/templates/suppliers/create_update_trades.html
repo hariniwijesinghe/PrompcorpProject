@@ -1,0 +1,206 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Trades(Contractors) {% endblock title %}
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+            {% if not form.instance.pk %}
+                <h1>Add Trades(Contractors)</h1>
+            {% else %}
+                <h1>Edit Trades(Contractors)</h1>
+            {% endif %}
+            </div>
+            <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{% url 'admin:trades_list' %}">Supplier Trades(Contractors)</a></li>
+                {% if not form.instance.pk %}
+                <li class="breadcrumb-item active">Add Trades(Contractors)</li>
+                {% else %}
+                <li class="breadcrumb-item active">Edit Trades(Contractors)</li>
+                {% endif %}
+            </ol>
+            </div>
+        </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+        <!-- form start -->
+        <form id="quickForm" method="POST">
+      <div class="row">
+            <!-- left column -->
+            <div class="col-md-6">
+            <!-- jquery validation -->
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Personal Information</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    {% csrf_token %}
+                        <div class="form-group">
+                            <label for="{{ form.agent_id.id_for_label }}">{{ form.agent_id.label }}</label>
+                            {{ form.agent_id }}
+                            {% if form.agent_id.errors %}
+                                <small class="text-danger">{{ form.agent_id.errors }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <small class="text-danger">{{ form.first_name.errors }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <small class="text-danger">{{ form.last_name.errors }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
+                            {{ form.contact }}
+                            {% if form.contact.errors %}
+                                <small class="text-danger">{{ form.contact.errors }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <small class="text-danger">{{ form.location.errors }}</small>
+                            {% endif %}
+                        </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            </div>
+            <!--/.col (left) -->
+            <!-- right column -->
+            <div class="col-md-6">
+                <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Banking Information</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="{{ form.bank_name.id_for_label }}">{{ form.bank_name.label }}</label>
+                        {{ form.bank_name }}
+                        {% if form.bank_name.errors %}
+                            <small class="text-danger">{{ form.bank_name.errors }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.account_holder_name.id_for_label }}">{{ form.account_holder_name.label }}</label>
+                        {{ form.account_holder_name }}
+                        {% if form.account_holder_name.errors %}
+                            <small class="text-danger">{{ form.account_holder_name.errors }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.account_number.id_for_label }}">{{ form.account_number.label }}</label>
+                        {{ form.account_number }}
+                        {% if form.account_number.errors %}
+                            <small class="text-danger">{{ form.account_number.errors }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.bsb.id_for_label }}">{{ form.bsb.label }}</label>
+                        {{ form.bsb }}
+                        {% if form.bsb.errors %}
+                            <small class="text-danger">{{ form.bsb.errors }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    {% if not form.instance.pk %}
+                    <button type="submit" class="btn btn-primary">Create Trades</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-primary">Update Trades</button>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+      </div>
+    </form>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+<!-- jquery-validation -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script>
+  $(function () {
+        $("#id_contact").mask("0000 000 000");
+      $('#quickForm').validate({
+      rules: {
+        first_name: {
+              required: true
+          },
+        last_name: {
+              required: true
+          },
+        agent_id: {
+              required: true,
+          },
+        account_holder_name: {
+              required: true
+          },
+        bank_name: {
+              required: true
+          },
+        account_number: {
+              required: true
+          },
+        bsb: {
+              required: true
+          },
+        contact: {
+              required: true,
+              australianPhone: true
+          },
+        location: {
+              required: true
+          }
+      },
+        messages: {
+            contact:{
+                required: "Contact is required.",
+                australianPhone: "Please enter a valid Australian phone number (e.g., 0412 345 678)."
+            }
+        },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+      }
+      });
+      $.validator.addMethod("australianPhone", function(value, element) {
+            var regex = /^(0[2-9]\d{1}\s?\d{4}\s?\d{4})$|^(04\d{2}\s?\d{3}\s?\d{3})$/;
+            return this.optional(element) || regex.test(value);
+        }, "Please enter a valid Australian phone number (e.g., 0412 345 678).")
+  });
+</script>
+{% endblock extra_scripts %}

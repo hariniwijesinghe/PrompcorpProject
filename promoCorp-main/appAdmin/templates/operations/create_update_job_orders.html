@@ -1,0 +1,122 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Job Orders {% endblock title %}
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+            {% if not form.instance.pk %}
+                <h1>Add Job Order</h1>
+            {% else %}
+                <h1>Edit Job Order</h1>
+            {% endif %}
+            </div>
+            <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{% url 'admin:job_orders_list' %}">Job Orders</a></li>
+                {% if not form.instance.pk %}
+                <li class="breadcrumb-item active">Add Job Order</li>
+                {% else %}
+                <li class="breadcrumb-item active">Edit Job Order</li>
+                {% endif %}
+            </ol>
+            </div>
+        </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-6">
+          <!-- jquery validation -->
+          <div class="card card-primary">
+            <div class="card-header">
+                {% if not form.instance.pk %}
+                <h3 class="card-title">Add Job Order</h3>
+                {% else %}
+                <h3 class="card-title">Edit Job Order</h3>
+                {% endif %}
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="quickForm" method="POST">
+              <div class="card-body">
+                {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{field}}
+                        </div>
+                        <small class="text-danger">{{ field.errors }}</small>
+                    {% endfor %}
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                {% if not form.instance.pk %}
+                <button type="submit" class="btn btn-primary">Create Job Order</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">Update Job Order</button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+          <!-- /.card -->
+          </div>
+        <!--/.col (left) -->
+        <!-- right column -->
+        <div class="col-md-6">
+
+        </div>
+        <!--/.col (right) -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+<!-- jquery-validation -->
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script>
+  $(function () {
+      $('#quickForm').validate({
+      rules: {
+        job_desc: {
+              required: true
+          },
+          job_type: {
+              required: true
+          },
+          work_order_id: {
+              required: true,
+          },
+          assignee: {
+              required: true
+          },
+          job_status: {
+              required: true
+          }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+      }
+      });
+  });
+</script>
+{% endblock extra_scripts %}

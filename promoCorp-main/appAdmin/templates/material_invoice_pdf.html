@@ -1,0 +1,81 @@
+<!-- templates/invoice_pdf.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-details, .invoice-items {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .invoice-details th, .invoice-items th {
+            text-align: left;
+            padding: 8px;
+        }
+        .invoice-details td, .invoice-items td {
+            padding: 8px;
+        }
+        .total-price {
+            text-align: right;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1>PrompCorp</h1>
+        <p>Invoice ID: #{{ invoice.material_invoice_id }}</p>
+    </div>
+    <table class="invoice-details">
+        <tr>
+            <th>Store Branch:</th>
+            <td>{{ invoice.store_branch_id.branch_name }}</td>
+        </tr>
+        <tr>
+            <th>ABN:</th>
+            <td>{{ invoice.store_branch_id.abn }}</td>
+        </tr>
+        <tr>
+            <th>Approver:</th>
+            <td>{{ invoice.approver }}</td>
+        </tr>
+        <tr>
+            <th>Date:</th>
+            <td>{{ invoice.date_time }}</td>
+        </tr>
+    </table>
+    <table class="invoice-items" border="1" cellspacing="0" cellpadding="4">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Individual Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.items }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.individual_price }}</td>
+                <td>${{ item.quantity|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="total-price">
+        <strong>Total Price:</strong> ${{ invoice.total_price }}
+    </div>
+</body>
+</html>
